@@ -1,5 +1,5 @@
 import json
-from config import DATA_FILE, HTML_FILE
+from config import DATA_FILE, HTML_FILE, DIST_DIR
 
 with open(DATA_FILE, "r", encoding="utf-8") as f:
     data = json.load(f)
@@ -38,6 +38,13 @@ html = '''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1b2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="书海">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
 <title>智慧之塔 · 我的书海 · Notion 实时数据</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -608,6 +615,7 @@ document.addEventListener('click',function(e){
 });
 
 renderDashboard();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
 </script>
 </body>
 </html>'''
@@ -616,3 +624,54 @@ with open(HTML_FILE, "w", encoding="utf-8") as f:
     f.write(html)
 print(f"Generated {HTML_FILE} ({len(html)} chars)")
 print(f"Books: {len(books)}, Covers: {stats['booksWithCover']}")
+
+# ===== PWA: manifest.json, sw.js, icon.svg =====
+import json as _json, os as _os
+
+manifest = {
+    "name": "智慧之塔 · 我的书海",
+    "short_name": "书海",
+    "description": "Notion 图书数据驱动的书海仪表盘",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#1a1b2e",
+    "theme_color": "#7F77DD",
+    "icons": [
+        {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+    ],
+}
+with open(_os.path.join(DIST_DIR, "manifest.json"), "w", encoding="utf-8") as f:
+    _json.dump(manifest, f, ensure_ascii=False, indent=2)
+
+sw_js = r'''const CACHE="booknotes-v1";
+self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["./","./index.html","./manifest.json","./icon.svg"])));self.skipWaiting();});
+self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim();});
+self.addEventListener("fetch",e=>{
+  if(e.request.method!=="GET")return;
+  e.respondWith(
+    caches.match(e.request).then(cached=>{
+      const fetchPromise=fetch(e.request).then(resp=>{
+        if(resp.ok&&e.request.url.startsWith(self.location.origin)){
+          const clone=resp.clone();
+          caches.open(CACHE).then(c=>c.put(e.request,clone));
+        }
+        return resp;
+      }).catch(()=>cached);
+      return cached||fetchPromise;
+    })
+  );
+});'''
+with open(_os.path.join(DIST_DIR, "sw.js"), "w", encoding="utf-8") as f:
+    f.write(sw_js)
+
+icon_svg = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7F77DD"/><stop offset="100%" stop-color="#534AB7"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#g)"/>
+<path d="M160 140 Q160 120 180 120 L256 120 L256 392 L180 392 Q160 392 160 372 Z" fill="#fff" opacity="0.95"/>
+<path d="M352 140 Q352 120 332 120 L256 120 L256 392 L332 392 Q352 392 352 372 Z" fill="#fff" opacity="0.75"/>
+<line x1="256" y1="120" x2="256" y2="392" stroke="#534AB7" stroke-width="4"/>
+</svg>'''
+with open(_os.path.join(DIST_DIR, "icon.svg"), "w", encoding="utf-8") as f:
+    f.write(icon_svg)
+
+print("Generated PWA files: manifest.json, sw.js, icon.svg")
