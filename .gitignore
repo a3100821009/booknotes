@@ -1,0 +1,10 @@
+.env
+dist/
+__pycache__/
+*.pyc
+.DS_Store
+books_data.json
+books_data_full.json
+reading_records.json
+booknotes.html
+booknotes_notion.html
