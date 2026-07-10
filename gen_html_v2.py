@@ -229,7 +229,62 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-se
 .panel.collapsed .panel-header{margin-bottom:0}
 
 /* ===== Responsive ===== */
-@media (max-width:900px){.sidebar{transform:translateX(-100%)}.sidebar.hidden{transform:translateX(-100%)}.main{margin-left:0;padding:16px}.main.expanded{padding-left:16px}.sidebar-toggle{left:16px}.sidebar-toggle.collapsed{left:16px}.dashboard-grid,.dashboard-grid-2{grid-template-columns:1fr}.book-detail-hero{flex-direction:column;gap:20px}.book-detail-cover{width:140px;height:196px}.search-box{width:100%}}
+@media (max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.hidden{transform:translateX(-100%)}
+  .main{margin-left:0;padding:16px}
+  .main.expanded{padding-left:16px}
+  .sidebar-toggle{left:16px}
+  .sidebar-toggle.collapsed{left:16px}
+  .dashboard-grid,.dashboard-grid-2{grid-template-columns:1fr}
+  .book-detail-hero{flex-direction:column;gap:20px;align-items:center;text-align:center}
+  .book-detail-cover{width:140px;height:196px}
+  .book-detail-info{width:100%}
+  .book-detail-tags{justify-content:center}
+  .book-detail-stats{justify-content:center}
+  .search-box{width:100%}
+  .topbar{flex-direction:column;align-items:stretch}
+  .view-selector{font-size:20px}
+}
+@media (max-width:640px){
+  .main{padding:12px}
+  .main.expanded{padding-left:12px;padding-right:12px}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .stat-card{padding:14px}
+  .stat-value{font-size:22px}
+  .stat-icon{width:36px;height:36px;font-size:16px}
+  .stat-label{font-size:12px}
+  .stat-trend{font-size:11px}
+  .gallery-grid{grid-template-columns:repeat(3,1fr);gap:10px}
+  .gallery-cover-title{font-size:12px}
+  .gallery-cover-author{font-size:10px}
+  .gallery-title{font-size:11px}
+  .gallery-progress-track{height:3px}
+  .panel{padding:14px}
+  .panel-title{font-size:14px}
+  .chart-container{height:200px}
+  .page-title{font-size:20px}
+  .page-subtitle{font-size:12px}
+  .view-selector{font-size:18px}
+  .book-detail-info h1{font-size:22px}
+  .book-detail-cover{width:120px;height:168px}
+  .note-item{font-size:12px;line-height:1.7}
+  .note-quote{font-size:12px;padding:10px 12px}
+  .note-section-title{font-size:13px}
+  .filter-chip{padding:5px 10px;font-size:11px}
+  .search-box{padding:6px 12px}
+  .search-box input{font-size:12px}
+  .heatmap{min-width:600px}
+  .author-row{gap:8px}
+  .author-row>div:first-child{width:80px;font-size:12px}
+  .back-btn{padding:6px 14px;font-size:12px}
+  .timeline{padding-left:20px}
+}
+@media (max-width:380px){
+  .stats-grid{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-value{font-size:20px}
+}
 </style>
 </head>
 <body>
