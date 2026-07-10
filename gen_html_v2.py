@@ -229,13 +229,14 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-se
 .panel.collapsed .panel-header{margin-bottom:0}
 
 /* ===== Responsive ===== */
+.bottom-nav{display:none}
+
 @media (max-width:900px){
   .sidebar{transform:translateX(-100%)}
   .sidebar.hidden{transform:translateX(-100%)}
-  .main{margin-left:0;padding:16px}
-  .main.expanded{padding-left:16px}
-  .sidebar-toggle{left:16px}
-  .sidebar-toggle.collapsed{left:16px}
+  .main{margin-left:0;padding:14px 14px 80px}
+  .main.expanded{padding-left:14px;padding-right:14px}
+  .sidebar-toggle{display:none}
   .dashboard-grid,.dashboard-grid-2{grid-template-columns:1fr}
   .book-detail-hero{flex-direction:column;gap:20px;align-items:center;text-align:center}
   .book-detail-cover{width:140px;height:196px}
@@ -243,31 +244,35 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-se
   .book-detail-tags{justify-content:center}
   .book-detail-stats{justify-content:center}
   .search-box{width:100%}
-  .topbar{flex-direction:column;align-items:stretch}
+  .topbar{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:16px}
   .view-selector{font-size:20px}
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--bg-secondary);border-top:1px solid var(--border);z-index:200;padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around}
+  .bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 10px;cursor:pointer;color:var(--text-tertiary);font-size:10px;transition:color 0.2s;min-width:50px}
+  .bottom-nav-item.active{color:var(--accent-purple)}
+  .bottom-nav-item i{font-size:18px}
 }
 @media (max-width:640px){
-  .main{padding:12px}
+  .main{padding:12px 12px 80px}
   .main.expanded{padding-left:12px;padding-right:12px}
   .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px}
   .stat-card{padding:14px}
-  .stat-value{font-size:22px}
-  .stat-icon{width:36px;height:36px;font-size:16px}
-  .stat-label{font-size:12px}
-  .stat-trend{font-size:11px}
-  .gallery-grid{grid-template-columns:repeat(3,1fr);gap:10px}
-  .gallery-cover-title{font-size:12px}
+  .stat-value{font-size:20px}
+  .stat-icon{width:34px;height:34px;font-size:15px}
+  .stat-label{font-size:11px}
+  .stat-trend{font-size:10px}
+  .gallery-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .gallery-cover-title{font-size:13px}
   .gallery-cover-author{font-size:10px}
-  .gallery-title{font-size:11px}
+  .gallery-title{font-size:12px}
   .gallery-progress-track{height:3px}
   .panel{padding:14px}
-  .panel-title{font-size:14px}
+  .panel-title{font-size:13px}
   .chart-container{height:200px}
-  .page-title{font-size:20px}
-  .page-subtitle{font-size:12px}
-  .view-selector{font-size:18px}
-  .book-detail-info h1{font-size:22px}
-  .book-detail-cover{width:120px;height:168px}
+  .page-title{font-size:18px}
+  .page-subtitle{font-size:11px}
+  .view-selector{font-size:17px}
+  .book-detail-info h1{font-size:20px}
+  .book-detail-cover{width:110px;height:154px}
   .note-item{font-size:12px;line-height:1.7}
   .note-quote{font-size:12px;padding:10px 12px}
   .note-section-title{font-size:13px}
@@ -279,11 +284,11 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-se
   .author-row>div:first-child{width:80px;font-size:12px}
   .back-btn{padding:6px 14px;font-size:12px}
   .timeline{padding-left:20px}
+  .notion-badge{display:none}
 }
 @media (max-width:380px){
   .stats-grid{grid-template-columns:1fr}
   .gallery-grid{grid-template-columns:repeat(2,1fr)}
-  .stat-value{font-size:20px}
 }
 </style>
 </head>
@@ -345,6 +350,13 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-se
 <div class="view" id="view-bookdetail"><div id="bookDetailContent"></div></div>
 </main>
 </div>
+<nav class="bottom-nav" id="bottomNav">
+<div class="bottom-nav-item active" data-view="dashboard"><i class="fas fa-gauge-high"></i><span>看板</span></div>
+<div class="bottom-nav-item" data-view="bookshelf"><i class="fas fa-bookmark"></i><span>书架</span></div>
+<div class="bottom-nav-item" data-view="stats"><i class="fas fa-chart-line"></i><span>统计</span></div>
+<div class="bottom-nav-item" data-view="reading"><i class="fas fa-book-open"></i><span>在读</span></div>
+<div class="bottom-nav-item" onclick="focusSearch()"><i class="fas fa-search"></i><span>搜索</span></div>
+</nav>
 <div class="notion-badge"><i class="fas fa-database"></i> Notion API · 图书总览 · 实时数据</div>
 <script>
 const BOOKS=''' + books_js + ''';
@@ -402,6 +414,8 @@ document.addEventListener('click',function(e){
 });
 
 document.querySelectorAll('.nav-item').forEach(item=>item.addEventListener('click',()=>switchView(item.dataset.view)));
+document.querySelectorAll('.bottom-nav-item[data-view]').forEach(function(item){item.addEventListener('click',function(){switchView(item.dataset.view);});});
+function focusSearch(){document.getElementById('globalSearch').focus();}
 
 function switchView(view){
   closeViewMenu();
@@ -410,6 +424,9 @@ function switchView(view){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   var navEl=document.querySelector('.nav-item[data-view="'+view+'"]');
   if(navEl)navEl.classList.add('active');
+  document.querySelectorAll('.bottom-nav-item').forEach(function(n){n.classList.remove('active');});
+  var bnEl=document.querySelector('.bottom-nav-item[data-view="'+view+'"]');
+  if(bnEl)bnEl.classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   var viewEl=document.getElementById('view-'+view);
   if(viewEl)viewEl.classList.add('active');
